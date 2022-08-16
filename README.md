@@ -31,7 +31,7 @@ Differences on `lambda x:x['token']['lemma']`:
 {'event': '…', 'chisq': 1135.7272474952044, 'chisq_p': 5.673920109982285e-249, 'cramers_v': 0.06957402089144266, 'odds_ratio': (29.21324122737166, True)}
 {'event': '.', 'chisq': 966.3613311948499, 'chisq_p': 3.6831991618905715e-212, 'cramers_v': 0.06417706510165858, 'odds_ratio': (1943.1095197895877, False)}
 {'event': 'ne', 'chisq': 893.8107212975139, 'chisq_p': 2.1742059484156198e-196, 'cramers_v': 0.06172098673848206, 'odds_ratio': (4.567216172071131, True)}
-``` 
+```
 
 Differences on `lambda x:x['token']['deprel']`:
 
