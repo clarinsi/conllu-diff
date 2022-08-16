@@ -48,7 +48,8 @@ Differences on `lambda x:x['token']['deprel']`:
 {'event': 'amod', 'chisq': 523.7028691386917, 'chisq_p': 6.621236773231577e-116, 'cramers_v': 0.047244641439906455, 'odds_ratio': (2.3917425656320344, False)}
 ```
 
-Differences on `lambda x:x['token']['deprel']+'_'+x['tokenlist'][x['token']['head']-1]['deprel']`:
+Differences on `lambda x:x['token']['deprel']+'_'+x['tokenlist'][x['token']['head']-1]['deprel']`
+(deprel and the deprel of the head):
 
 ```
 {'event': 'root_root', 'chisq': 7070.889958513253, 'chisq_p': 0.0, 'cramers_v': 0.17359896035273648, 'odds_ratio': (648.5884638574395, True)}
