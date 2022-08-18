@@ -1,7 +1,14 @@
 # conllu-diff
 
-Prototype results on sl_sst-ud-train.conllu vs. sl_ssj-ud-train.conllu. Ten strongest differences (if significant) ordered by the chi-square
-statistic are given.
+Prototype results on sl_sst-ud-train.conllu vs. sl_ssj-ud-train.conllu. Strongest significant differences ordered by the chi-square statistic are given.
+
+The following statistics are currently available:
+- `chisq` - The chi-square statistical test. God
+- `chisq_p` - The p-value of the chi-square test. Very useful for discarding results with p-value below 0.05. These results you simply cannot trust (they might have happened by chance) and do not have to look at.
+- `cramers_v` - The Cramer's V effect size, based on the chi square statistic and the sample size. Traditionally it should be over 0.1 for small effect, over 0.3 for medium effect and over 0.5 for strong effect, but on language phenomena it will never achieve even medium effect. It is comparable across datasets of different sizes, so if the tool is run on multiple pairs of documents, these effect sizes CAN be used for comparison across datasets.
+- `odds_ratio` - The odds ratio effect size. Put simply - it reports how many times the odds of an event are higher in one dataset in comparison to another dataset. It is always higher than 1. This is why `odds_ratio_direction` gives info on the dataset for which the odds of a specific event are higher.
+- `odds_ratio_direction` - The direction of the odds ratio presented previously. If `first`, the odds of the event are greater in the first dataset. If `second`, the odds for this event are higher in the second dataset.
+- `log_likelihood_ratio` - The log-likelihood ratio, as defined by Danning (1993), here mostly for reasons of popularity in the computational linguistics circles.
 
 Differences on `lambda x:x['token']['upos']`:
 
