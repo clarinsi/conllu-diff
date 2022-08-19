@@ -1,8 +1,16 @@
 # conllu-diff
 
-Prototype results on sl_sst-ud-train.conllu vs. sl_ssj-ud-train.conllu. Strongest significant differences ordered by the chi-square statistic are given.
+A tool for statistically comparing two conllu files. The tool is configured through a JSON configuration file (example in `config_files/ssj_sst_upos.json`) where the user defines:
+- `file1` - The conllu file containing the first language sample
+- `file2` - The conllu file containing the second language sample
+- `event` - The linguistic feature the comparison is to be based on, optional events are form, lemma, upos, xpos, upos+feats, feat (each feature separately), feats (all features of a word merged), deprel, deprel+head_deprel
+- `filter` - The filter removing all entries that did not pass the chi-square p-value threshold of <0.05 
+- `fields` - A list of fields to be retained in the output (list of available values is listed below)
+- `order` - The field by which the output is to be ordered
+- `reverse` - Whether the ordering should be reverse
+- `output` - Where the output is to be produced, either stdout or filename
 
-The following statistics are currently available:
+The following fields / values are currently available:
 - `chisq` - The chi-square statistical test. God
 - `chisq_p` - The p-value of the chi-square test. Very useful for discarding results with p-value below 0.05. These results you simply cannot trust (they might have happened by chance) and do not have to look at.
 - `cramers_v` - The Cramer's V effect size, based on the chi square statistic and the sample size. Traditionally it should be over 0.1 for small effect, over 0.3 for medium effect and over 0.5 for strong effect, but on language phenomena it will never achieve even medium effect. It is comparable across datasets of different sizes, so if the tool is run on multiple pairs of documents, these effect sizes CAN be used for comparison across datasets.
@@ -10,7 +18,9 @@ The following statistics are currently available:
 - `odds_ratio_direction` - The direction of the odds ratio presented previously. If `first`, the odds of the event are greater in the first dataset. If `second`, the odds for this event are higher in the second dataset.
 - `log_likelihood_ratio` - The log-likelihood ratio, as defined by Danning (1993), here mostly for reasons of popularity in the computational linguistics circles.
 
-Differences on `lambda x:x['token']['upos']`:
+Running the tool on the exemplary JSON configuration file compares the UPOS dependence between the two files, `sl_sst-ud-train.conllu` and `sl_ssj-ud-train.conllu`.
+
+The output of the tool with the `event` set to `upos`:
 
 ```
 event	cramers_v	odds_ratio	odds_ratio_direction
@@ -32,7 +42,7 @@ SYM	0.00788752606312867	31.431147723995498	first
 NUM	0.006279927568528497	1.1841482466696223	first
 ```
 
-Differences on `lambda x:x['token']['lemma']`:
+The output of the tool if the event is `lemma`:
 
 ```
 event	cramers_v	odds_ratio	odds_ratio_direction
@@ -91,7 +101,7 @@ aaa	0.02269213397252964	276.39252864703764	second
 ...
 ```
 
-Differences on `lambda x:[e[0]+':'+e[1] for e in x['token']['feats'].items()] if x['token']['feats']!=None else None` (specific key:value pairs from feats):
+The output of the tool if the event is `feat`:
 
 ```
 event	cramers_v	odds_ratio	odds_ratio_direction
@@ -141,7 +151,7 @@ Definite:Ind	0.0027015758531109017	1.230778104542293	first
 NumType:Mult	0.002586134214293405	5.35236774349564	second
 ```
 
-Differences on `lambda x:x['token']['deprel']`:
+Output of the tool if the event is `deprel`:
 
 ```
 event	cramers_v	odds_ratio	odds_ratio_direction
@@ -178,8 +188,7 @@ dep	0.006150595406649066	4.385886921540406	first
 aux	0.005735206555028642	1.1100447817440058	first
 ```
 
-Differences on `lambda x:x['token']['deprel']+'_'+x['tokenlist'][x['token']['head']-1]['deprel'] if x['token']['deprel']!='root' else None`
-(deprel and the deprel of the head):
+Output of the tool if the event is `deprel+head_deprel`:
 
 ```
 discourse_root	0.18202736862729124	76.9150923698931	second

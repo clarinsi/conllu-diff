@@ -1,23 +1,40 @@
 from conllu import parse_incr,parse
+import sys
 from scipy.stats import chi2_contingency
 import argparse
 import importlib
 parser = argparse.ArgumentParser(description='')
-#parser.add_argument('file1', metavar='f1', type=open, help='first conllu file')
-#parser.add_argument('file2', metavar='f2', type=open, help='second conllu file')
-parser.add_argument('config', metavar='c', type=str, help='configuration file')
+parser.add_argument('config', metavar='c', type=str, help='JSON configuration file')
 args = parser.parse_args()
-spec = importlib.util.spec_from_file_location('config',args.config)
-config = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(config)
+import json
+#from types import SimpleNamespace
+#config=json.load(open(args.config),object_hook=lambda d: SimpleNamespace(**d))
+config=json.load(open(args.config))
 from collections import Counter
 from math import sqrt,log
 
+predefined_events={
+'form':lambda x:x['token']['form'],
+'lemma':lambda x:x['token']['lemma'],
+'upos':lambda x:x['token']['upos'],
+'xpos':lambda x:x['token']['xpos'],
+'upos+feats':lambda x:x['token']['upos']+'_'+'|'.join([e[0]+':'+e[1] for e in x['token']['feats'].items()]) if x['token']['feats']!=None else x['token']['upos'],
+'feat':lambda x:[e[0]+':'+e[1] for e in x['token']['feats'].items()] if x['token']['feats']!=None else None,
+'feats':lambda x:'|'.join([e[0]+':'+e[1] for e in x['token']['feats'].items()]) if x['token']['feats']!=None else None,
+'deprel':lambda x:x['token']['deprel'],
+'deprel+head_deprel':lambda x:x['token']['deprel']+'_'+x['tokenlist'][x['token']['head']-1]['deprel'] if x['token']['deprel']!='root' else None
+}
+
+if config['event'] in predefined_events:
+    config['event_function']=predefined_events[config['event']]
+else:
+    config['event_function']=eval(config['event'])
+
 events1=[]
-for tokenlist in parse_incr(open(config.file1)):
+for tokenlist in parse_incr(open(config['file1'])):
     #print(tokenlist[0]['feats'])
     for token in tokenlist:
-        event=config.event_function({'token':token,'tokenlist':tokenlist})
+        event=config['event_function']({'token':token,'tokenlist':tokenlist})
         if event!=None:
             if not isinstance(event,list):
                 events1.append(event)
@@ -27,10 +44,10 @@ c1=len(events1)
 events1=Counter(events1)
 
 events2=[]
-for tokenlist in parse_incr(open(config.file2)):
+for tokenlist in parse_incr(open(config['file2'])):
     #print(tokenlist[0]['form'])
     for token in tokenlist:
-        event=config.event_function({'token':token,'tokenlist':tokenlist})
+        event=config['event_function']({'token':token,'tokenlist':tokenlist})
         if event!=None:
             if not isinstance(event,list):
                 events2.append(event)
@@ -72,10 +89,17 @@ for event in set(events1).union(set(events2)):
 # craig's zetta (might need substructure
 # multiple feature extractors? a vs b
 
-results=config.rank_function(results)
+if config['filter']=='chisq_p':
+    results=[e for e in results if e['chisq_p']<0.05]
+if config['order'] in results[0]:
+    results=sorted(results,key=lambda x:x[config['order']], reverse=config['reverse'])
 import csv
-csvfile=config.output
-writer=csv.DictWriter(csvfile,config.fieldnames,delimiter='\t',extrasaction='ignore')
+if config['output']=='stdout':
+    csvfile=sys.stdout
+else:
+    csvfile=open(config['output'],'w')
+writer=csv.DictWriter(csvfile,config['fields'],delimiter='\t',extrasaction='ignore')
 writer.writeheader()
 for result in results:
     writer.writerow(result)
+csvfile.close()
