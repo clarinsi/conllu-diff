@@ -89,8 +89,8 @@ for event in set(events1).union(set(events2)):
 # craig's zetta (might need substructure
 # multiple feature extractors? a vs b
 
-if config['filter']=='chisq_p':
-    results=[e for e in results if e['chisq_p']<0.05]
+if 'filter' in config:
+    results=[e for e in results if e['chisq_p']<float(config['filter'])]
 if config['order'] in results[0]:
     results=sorted(results,key=lambda x:x[config['order']], reverse=config['reverse'])
 import csv

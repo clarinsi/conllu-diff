@@ -4,7 +4,7 @@ A tool for statistically comparing two conllu files. The tool is configured thro
 - `file1` - The conllu file containing the first language sample
 - `file2` - The conllu file containing the second language sample
 - `event` - The linguistic feature the comparison is to be based on, optional events are form, lemma, upos, xpos, upos+feats, feat (each feature separately), feats (all features of a word merged), deprel, deprel+head_deprel
-- `filter` - The filter removing all entries that did not pass the chi-square p-value threshold of <0.05 
+- `filter` - The minimum p-value of the chi-square test for the entry to be filtered from the results
 - `fields` - A list of fields to be retained in the output (list of available values is listed below)
 - `order` - The field by which the output is to be ordered
 - `reverse` - Whether the ordering should be reverse
