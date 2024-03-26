@@ -42,8 +42,18 @@ predefined_events = {
 
 class Differ:
     """Class for reading and statistical analysis of two
-    CONLLU documents.
+CONLLU documents.
+
+Example use
+===========
+
+.. code-block:: python
+
+    from conlludiff import Differ
+    d = Differ("file1.conllu", "file2.conllu")
+    d.to_tsv("output.tsv")
     """
+
 
     def __init__(
         self,
@@ -63,22 +73,23 @@ class Differ:
     ):
         """Method to instantiate an instance with all the necessary data and run analysis.
 
-        Args:
-            file1 (str | Path): First CONLLU path
-            file2 (str | Path): Second CONLLU path
-            event (str, optional): The linguistic feature the comparison is to be based on, optional events are "form", "lemma", "upos", "xpos", "upos+feats", "feat" (each feature separately), "feats" (all features of a word merged), "deprel", "deprel+head_deprel". Defaults to "upos".
-            filter (float | None, optional):  The minimum p-value of the chi-square test for the entry to be filtered from the results. If None, the results will not be filtered. Defaults to None.
-            fields (list[str], optional): A list of fields to be retained in the output. Possible elements are:
-                * "chisq": The chi-square statistical test.
-                * "chisq_p": The p-value of the chi-square test. Very useful for discarding results with p-value below 0.05. These results you simply cannot trust (they might have happened by chance) and do not have to look at.
-                * "cramers_v": The Cramer's V effect size, based on the chi square statistic and the sample size. Traditionally it should be over 0.1 for small effect, over 0.3 for medium effect and over 0.5 for strong effect, but on language phenomena it will never achieve even medium effect. It is comparable across datasets of different sizes, so if the tool is run on multiple pairs of documents, these effect sizes CAN be used for comparison across datasets.
-                * "odds_ratio": The odds ratio effect size. Put simply - it reports how many times the odds of an event are higher in one dataset in comparison to another dataset. It is always higher than 1. This is why odds_ratio_direction gives info on the dataset for which the odds of a specific event are higher.
-                * "odds_ratio_direction": The direction of the odds ratio presented previously. If first, the odds of the event are greater in the first dataset. If second, the odds for this event are higher in the second dataset.
-                * "log_likelihood_ratio": The log-likelihood ratio, as defined by Danning (1993), here mostly for reasons of popularity in the computational linguistics circles.
+        :param file1: First CONLLU path
+        :type file1: str | Path
+        :param file2: Second CONLLU path
+        :type file2: str | Path
+        :param event: The linguistic feature the comparison is to be based on, optional events are "form", "lemma", "upos", "xpos", "upos+feats", "feat" (each feature separately), "feats" (all features of a word merged), "deprel", "deprel+head_deprel". defaults to "upos"
+        :type event: str, optional
+        :param filter: The minimum p-value of the chi-square test for the entry to be filtered from the results, defaults to None
+        :type filter: float | None, optional
+        :param fields: List of values to be returned, defaults to [ "event", "cramers_v", "odds_ratio", "odds_ratio_direction", "contingency", ]
+        :type fields: list[str], optional
+        :param order: The value by which the events will be ordered, defaults to "chisq"
+        :type order: str, optional
+        :param reverse: Whether the order has to be reverse, defaults to True
+        :type reverse: bool, optional
 
-                Defaults to ["event","cramers_v","odds_ratio","odds_ratio_direction","contingency"].
-            order (str, optional): The field by which the output is to be ordered. Defaults to "chisq".
-            reverse (bool, optional): Whether the ordering should be reverse. Defaults to True.
+
+        After instantiating a Differ object, the metrics will be calculated automatically.
         """
         self.config = {
             "file1": file1,
@@ -89,17 +100,17 @@ class Differ:
             "order": order,
             "reverse": reverse,
         }
-        self.run()
+        self._run()
 
-    def to_csv(self, path: str | Path):
-        """Export the results to csv file
+    def to_tsv(self, path: str | Path):
+        """Export the results to tsv file
 
         Args:
             path (str | Path): Path to which results will be written
         """
         Path(path).write_text(self.results_string)
 
-    def run(self):
+    def _run(self):
         config = self.config
         if not config["filter"]:
             config["filter"] = inf
