@@ -1,0 +1,18 @@
+{
+"file1":"conllu_files/sl_ssj-ud-train.conllu",
+"file1_comment":"The conllu file containing the first language sample",
+"file2":"conllu_files/sl_sst-ud-train.conllu",
+"file2_comment":"The conllu file containing the second language sample",
+"event":"upos",
+"event_comment": "The linguistic feature the comparison is to be based on. Optional events are form, lemma, upos, xpos, upos+feats, feat (each feature separately), feats (all features of a word merged), deprel, deprel+head_deprel",
+"filter":0.05,
+"filter_comment": "The minimum p-value of the chi-square test for the entry to be filtered from the results",
+"fields":["event","cramers_v","odds_ratio","odds_ratio_direction","contingency"],
+"fields_comment":"List of values to be returned",
+"order":"chisq",
+"order_comment":"The value by which the events will be ordered",
+"reverse":true,
+"reverse_comment":"Whether the order has to be reverse",
+"output":"stdout",
+"output_comment": "Either stdout or filename"
+}
