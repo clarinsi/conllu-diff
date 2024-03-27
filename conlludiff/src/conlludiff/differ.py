@@ -200,7 +200,7 @@ class Differ:
                 key=lambda x: (x[config["order"]], x["event"]),
                 reverse=config["reverse"],
             )
-        self.results = results
+        self.results = [{f: i.get(f) for f in config["fields"]} for i in results]
         from contextlib import redirect_stdout
         import io
 
