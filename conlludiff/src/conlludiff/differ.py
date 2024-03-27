@@ -42,18 +42,17 @@ predefined_events = {
 
 class Differ:
     """Class for reading and statistical analysis of two
-CONLLU documents.
+    CONLLU documents.
 
-Example use
-===========
+    Example use
+    ===========
 
-.. code-block:: python
+    .. code-block:: python
 
-    from conlludiff import Differ
-    d = Differ("file1.conllu", "file2.conllu")
-    d.to_tsv("output.tsv")
+        from conlludiff import Differ
+        d = Differ("file1.conllu", "file2.conllu")
+        d.to_tsv("output.tsv")
     """
-
 
     def __init__(
         self,
@@ -197,7 +196,9 @@ Example use
             results = [e for e in results if e["chisq_p"] < float(config["filter"])]
         if config["order"] in results[0]:
             results = sorted(
-                results, key=lambda x: x[config["order"]], reverse=config["reverse"]
+                results,
+                key=lambda x: (x[config["order"]], x["event"]),
+                reverse=config["reverse"],
             )
         self.results = results
         from contextlib import redirect_stdout

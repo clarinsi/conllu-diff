@@ -15,6 +15,6 @@ d = Differ(
     order="chisq",
     reverse=True,
 )
-old = Path("data/original_deprel+head_deprel.csv").read_text()
+old = Path("data/original_deprel+head_depreHl.csv").read_text()
 d.to_tsv("data/new_deprel+head_deprel.csv")
 2 + 2
