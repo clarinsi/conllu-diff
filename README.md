@@ -1,6 +1,14 @@
 # conllu-diff
 
-A tool for statistically comparing two conllu files. The tool is configured through a JSON configuration file (example in `config_files/ssj_sst_upos.json`) where the user defines:
+A tool for statistically comparing two conllu files. It offers two equivalent use modes:
+* as a command line program
+* as a python package
+
+## CLI use
+
+Run as `python conlludiff <json>`.
+
+The tool is configured through a JSON configuration file (example in `config_files/ssj_sst_upos.json`) where the user defines:
 - `file1` - The conllu file containing the first language sample
 - `file2` - The conllu file containing the second language sample
 - `event` - The linguistic feature the comparison is to be based on, optional events are form, lemma, upos, xpos, upos+feats, feat (each feature separately), feats (all features of a word merged), deprel, deprel+head_deprel
@@ -11,12 +19,56 @@ A tool for statistically comparing two conllu files. The tool is configured thro
 - `output` - Where the output is to be produced, either stdout or filename
 
 The following fields / values are currently available:
-- `chisq` - The chi-square statistical test. God
+- `chisq` - The chi-square statistical test.
 - `chisq_p` - The p-value of the chi-square test. Very useful for discarding results with p-value below 0.05. These results you simply cannot trust (they might have happened by chance) and do not have to look at.
 - `cramers_v` - The Cramer's V effect size, based on the chi square statistic and the sample size. Traditionally it should be over 0.1 for small effect, over 0.3 for medium effect and over 0.5 for strong effect, but on language phenomena it will never achieve even medium effect. It is comparable across datasets of different sizes, so if the tool is run on multiple pairs of documents, these effect sizes CAN be used for comparison across datasets.
 - `odds_ratio` - The odds ratio effect size. Put simply - it reports how many times the odds of an event are higher in one dataset in comparison to another dataset. It is always higher than 1. This is why `odds_ratio_direction` gives info on the dataset for which the odds of a specific event are higher.
 - `odds_ratio_direction` - The direction of the odds ratio presented previously. If `first`, the odds of the event are greater in the first dataset. If `second`, the odds for this event are higher in the second dataset.
 - `log_likelihood_ratio` - The log-likelihood ratio, as defined by Danning (1993), here mostly for reasons of popularity in the computational linguistics circles.
+
+## Python API
+### Installation
+As of 2024-03-27T13:44:22 the package is not on pypi, so the only option is to download GitHub repo and install it as
+```
+pip install -e conllu-diff/conlludiff/
+```
+### Use
+The differ can be used through its python API as follows:
+
+```python
+from conlludiff import Differ
+
+d = Differ(
+    "conllu_files/sl_ssj-ud-train.conllu",
+    "conllu_files/sl_sst-ud-train.conllu",
+    event="upos",
+    filter=0.05,
+    fields=[
+        "event",
+        "cramers_v",
+        "odds_ratio",
+        "odds_ratio_direction",
+        "contingency"
+    ],
+    order="chisq",
+    reverse=True,
+)
+d.results
+#[
+# {'event': 'INTJ', 'cramers_v': 0.18546269144487967, 'odds_ratio': 205.64922609298688, 'odds_ratio_direction': 'second'},
+# {'event': 'PART', 'cramers_v': 0.09362273156839818, 'odds_ratio': 3.3765821947519883, 'odds_ratio_direction': 'second'},
+# {'event': 'PUNCT', 'cramers_v': 0.0817401329794944, 'odds_ratio': 3.619217699912104, 'odds_ratio_direction': 'first'},
+# {'event': 'ADV', 'cramers_v': 0.0697921632735567, 'odds_ratio': 2.368271631503067, 'odds_ratio_direction': 'second'},
+# {'event': 'NOUN', 'cramers_v': 0.06087356761646711, 'odds_ratio': 1.9182977375177561, 'odds_ratio_direction': 'first'}
+# ...]
+
+d.to_tsv("output.tsv")
+# Writes the data to a tsv, same way as CLI.
+```
+
+
+## Outputs
+
 
 Running the tool on the exemplary JSON configuration file compares the UPOS dependence between the two files, `sl_sst-ud-train.conllu` and `sl_ssj-ud-train.conllu`.
 
