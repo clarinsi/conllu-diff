@@ -4,6 +4,12 @@ A tool for statistically comparing two conllu files. It offers two equivalent us
 * as a command line program
 * as a python package
 
+## Installation
+
+```
+pip install conlludiff
+```
+
 ## CLI use
 
 Run as `python conlludiff <json>`.
@@ -27,11 +33,7 @@ The following fields / values are currently available:
 - `log_likelihood_ratio` - The log-likelihood ratio, as defined by Danning (1993), here mostly for reasons of popularity in the computational linguistics circles.
 
 ## Python API
-### Installation
-As of 2024-03-27T13:44:22 the package is not on pypi, so the only option is to download GitHub repo and install it as
-```
-pip install -e conllu-diff/conlludiff/
-```
+
 ### Use
 The differ can be used through its python API as follows:
 
@@ -297,4 +299,24 @@ discourse:filler_nmod	0.02905319526331687	411.3718494648406	second
 cc_parataxis	0.02872166122883359	22.302391238742672	second
 reparandum_advcl	0.028127597813434026	387.8425686172967	second
 ...
+```
+# Notes for developers
+
+## Building and publishing
+```
+cd conllu-diff/conlludiff
+# Bump version when done:
+bumpver update --patch # or --minor or --major
+python -m build
+twine check dist/*
+# test upload:
+twine upload --verbose -r testpypi dist/*
+# real upload:
+twine upload --verbose dist/*
+```
+
+## Testing
+```
+cd conllu-diff/conlludiff/tests
+pytest -vv
 ```

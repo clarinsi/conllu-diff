@@ -1,0 +1,43 @@
+[build-system]
+requires      = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "conlludiff"
+version = "0.0.3"
+description = "Analyze two CONLLU files"
+readme = "README.md"
+authors = [{ name = "Peter Rupnik", email = "rupnikpeter@gmail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["conlludiff", "conllu", "conll"]
+dependencies = [
+    "numpy",
+    "scipy",
+    "conllu"
+]
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = ["black", "bumpver", "isort", "pip-tools", "pytest", "sphinx"]
+
+[project.urls]
+Homepage = "https://github.com/clarinsi/conllu-diff"
+
+
+[tool.bumpver]
+current_version = "0.0.3"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message  = "Bump version {old_version} -> {new_version}"
+commit          = true
+tag             = true
+push            = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'version = "{version}"',
+]
