@@ -12,7 +12,7 @@ pip install conlludiff
 
 ## CLI use
 
-Run as `python conlludiff <json>`.
+Run as `python -m conlludiff <json>`.
 
 The tool is configured through a JSON configuration file (example in `config_files/ssj_sst_upos.json`) where the user defines:
 - `file1` - The conllu file containing the first language sample
