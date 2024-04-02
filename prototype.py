@@ -1,8 +1,13 @@
-from conllu import parse_incr, parse
-import sys
-from scipy.stats import chi2_contingency
 import argparse
 import importlib
+import logging
+import sys
+from collections import Counter
+from math import log, sqrt
+
+import numpy as np
+from conllu import parse, parse_incr
+from scipy.stats import chi2_contingency
 
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("config", metavar="c", type=str, help="JSON configuration file")
@@ -12,8 +17,6 @@ import json
 # from types import SimpleNamespace
 # config=json.load(open(args.config),object_hook=lambda d: SimpleNamespace(**d))
 config = json.load(open(args.config))
-from collections import Counter
-from math import sqrt, log
 
 predefined_events = {
     "form": lambda x: x["token"]["form"],
@@ -93,32 +96,44 @@ def llr(f1, c1, f2, c2):
         return
 
 
+invalid_counter = 0
 results = []
 for event in set(events1).union(set(events2)):
     f1 = events1.get(event, 0)
     f2 = events2.get(event, 0)
-    # try:
     test = chi2_contingency(((f1, c1 - f1), (f2, c2 - f2)))
-    # except:
-    #    continue
     or_result, or_direction = odds_ratio(f1, c1, f2, c2)
-    results.append(
-        {
-            "event": event,
-            "chisq": test[0],
-            "chisq_p": test[1],
-            "cramers_v": sqrt(test[0] / (c1 + c2)),
-            "odds_ratio": or_result,
-            "odds_ratio_direction": or_direction,
-            "llr": llr(f1, c1, f2, c2),
-            "contingency": ((f1, c1 - f1), (f2, c2 - f2)),
-        }
+    expected_f = list(np.append(*test.expected_freq))
+
+    # check if all expected frequencies are above 5
+    if any(y < 5 for y in expected_f):
+        invalid_counter += 1
+    else:
+        results.append(
+            {
+                "event": event,
+                "chisq": test[0],
+                "chisq_p": test[1],
+                "cramers_v": sqrt(test[0] / (c1 + c2)),
+                "odds_ratio": or_result,
+                "odds_ratio_direction": or_direction,
+                "llr": llr(f1, c1, f2, c2),
+                "contingency": ((f1, c1 - f1), (f2, c2 - f2)),
+            }
+        )
+
+if invalid_counter:
+    logging.warning(
+        f"{invalid_counter} events were not recorded since one or more expected values were "
+        f"less than 5"
     )
+
 # adam's wilcoxon
 # difference in relative frequency
 # craig's zetta (might need substructure
 # multiple feature extractors? a vs b
 
+# filter results
 if "filter" in config:
     results = [e for e in results if e["chisq_p"] < float(config["filter"])]
 if config["order"] in results[0]:

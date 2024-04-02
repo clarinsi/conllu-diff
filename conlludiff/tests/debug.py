@@ -4,7 +4,7 @@ from pathlib import Path
 d = Differ(
     "data/sl_ssj-ud-train.conllu",
     "data/sl_sst-ud-train.conllu",
-    event="upos",
+    event="deprel+head_deprel",
     filter=0.05,
     fields=[
         "event",

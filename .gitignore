@@ -4,3 +4,5 @@ __pycache__
 .pytest_cache
 doctrees
 dist
+luka
+linguistic_fingerprint_of_SUD.zip

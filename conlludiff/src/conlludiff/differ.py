@@ -7,7 +7,8 @@ from collections import Counter
 from conllu import parse_incr, parse
 from scipy.stats import chi2_contingency
 from math import sqrt, log, inf
-
+import logging
+import numpy as np
 
 predefined_events = {
     "form": lambda x: x["token"]["form"],
@@ -99,6 +100,8 @@ class Differ:
             "order": order,
             "reverse": reverse,
         }
+        if filter == None:
+            del self.config["filter"]
         self._run()
 
     def to_tsv(self, path: str | Path):
@@ -111,8 +114,8 @@ class Differ:
 
     def _run(self):
         config = self.config
-        if not config["filter"]:
-            config["filter"] = inf
+        # if not config["filter"]:
+        #     config["filter"] = inf
         if config["event"] in predefined_events:
             config["event_function"] = predefined_events[config["event"]]
         else:
@@ -166,6 +169,7 @@ class Differ:
             except:
                 return
 
+        invalid_counter = 0
         results = []
         for event in set(events1).union(set(events2)):
             f1 = events1.get(event, 0)
@@ -175,31 +179,40 @@ class Differ:
             # except:
             #    continue
             or_result, or_direction = odds_ratio(f1, c1, f2, c2)
-            results.append(
-                {
-                    "event": event,
-                    "chisq": test[0],
-                    "chisq_p": test[1],
-                    "cramers_v": sqrt(test[0] / (c1 + c2)),
-                    "odds_ratio": or_result,
-                    "odds_ratio_direction": or_direction,
-                    "llr": llr(f1, c1, f2, c2),
-                    "contingency": ((f1, c1 - f1), (f2, c2 - f2)),
-                }
+            expected_f = list(np.append(*test.expected_freq))
+            if any(y < 5 for y in expected_f):
+                invalid_counter += 1
+            else:
+                results.append(
+                    {
+                        "event": event,
+                        "chisq": test[0],
+                        "chisq_p": test[1],
+                        "cramers_v": sqrt(test[0] / (c1 + c2)),
+                        "odds_ratio": or_result,
+                        "odds_ratio_direction": or_direction,
+                        "llr": llr(f1, c1, f2, c2),
+                        "contingency": ((f1, c1 - f1), (f2, c2 - f2)),
+                    }
+                )
+        if invalid_counter:
+            logging.warning(
+                f"{invalid_counter} events were not recorded since {invalid_counter} values "
+                f"occured less than 5 times"
             )
         # adam's wilcoxon
         # difference in relative frequency
         # craig's zetta (might need substructure
         # multiple feature extractors? a vs b
 
-        if "filter" in config:
-            results = [e for e in results if e["chisq_p"] < float(config["filter"])]
         if config["order"] in results[0]:
             results = sorted(
                 results,
                 key=lambda x: (x[config["order"]], x["event"]),
                 reverse=config["reverse"],
             )
+        if "filter" in config:
+            results = [e for e in results if e["chisq_p"] < float(config["filter"])]
         self.results = [{f: i.get(f) for f in config["fields"]} for i in results]
         from contextlib import redirect_stdout
         import io
