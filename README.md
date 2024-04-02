@@ -1,4 +1,4 @@
-# conllu-diff
+# conllu-diff blaaa
 
 A tool for statistically comparing two conllu files. It offers two equivalent use modes:
 * as a command line script
@@ -317,6 +317,6 @@ twine upload --verbose dist/*
 
 ## Testing
 ```
-cd conllu-diff/conlludiff/tests
+cd conllu-diff/conlludiff
 pytest -vv
 ```

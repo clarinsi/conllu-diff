@@ -8,11 +8,18 @@ version = "0.0.5"
 description = "Analyze two CONLLU files"
 readme = "README.md"
 authors = [{ name = "Peter Rupnik", email = "rupnikpeter@gmail.com" }]
+maintainers = [{ name = "Peter Rupnik"}]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: Apache Software License",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 keywords = ["conlludiff", "conllu", "conll"]
 dependencies = [
@@ -27,7 +34,7 @@ dev = ["black", "bumpver", "isort", "pip-tools", "pytest", "sphinx"]
 
 [project.urls]
 Homepage = "https://github.com/clarinsi/conllu-diff"
-
+"Bug Reports" = "https://github.com/clarinsi/conllu-diff/issues"
 
 [tool.bumpver]
 current_version = "0.0.5"
@@ -40,4 +47,7 @@ push            = false
 [tool.bumpver.file_patterns]
 "pyproject.toml" = [
     'version = "{version}"',
+]
+"src/conlludiff/__init__.py" = [
+    '^__version__ = "{version}"$'
 ]
