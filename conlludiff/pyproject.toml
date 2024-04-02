@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "conlludiff"
-version = "0.0.3"
+version = "0.0.5"
 description = "Analyze two CONLLU files"
 readme = "README.md"
 authors = [{ name = "Peter Rupnik", email = "rupnikpeter@gmail.com" }]
@@ -20,7 +20,7 @@ dependencies = [
     "scipy",
     "conllu"
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 [project.optional-dependencies]
 dev = ["black", "bumpver", "isort", "pip-tools", "pytest", "sphinx"]
@@ -30,7 +30,7 @@ Homepage = "https://github.com/clarinsi/conllu-diff"
 
 
 [tool.bumpver]
-current_version = "0.0.3"
+current_version = "0.0.5"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "Bump version {old_version} -> {new_version}"
 commit          = true

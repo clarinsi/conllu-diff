@@ -1,7 +1,7 @@
 # conllu-diff
 
 A tool for statistically comparing two conllu files. It offers two equivalent use modes:
-* as a command line program
+* as a command line script
 * as a python package
 
 ## Installation
